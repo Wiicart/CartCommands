@@ -1,67 +1,108 @@
 package net.wiicart.commands.command.tree;
 
 import net.wiicart.commands.command.CartCommandExecutor;
-import net.wiicart.commands.command.CommandNodeImpl;
-import net.wiicart.commands.command.argument.ArgumentSequence;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 
-public final class CommandTreeBuilder {
+/**
+ * Class used to construct a {@link CommandTree}
+ */
+@SuppressWarnings({"UnusedReturnValue", "unused"})
+public final class TreeBuilder {
 
     private String name;
 
-    private ArgumentSequence arguments;
+    private final Set<String> aliases = new HashSet<>();
 
-    private final @Nullable CommandTree.Node parent;
-
-    private final Map<String, Consumer<CommandTreeBuilder>> children = new HashMap<>();
+    private final Map<String, Consumer<TreeBuilder>> children = new HashMap<>();
 
     private CartCommandExecutor executor = CartCommandExecutor.EMPTY;
 
-    CommandTreeBuilder(@NotNull String name) {
-        this.name = name;
-        parent = null;
+    TreeBuilder() {
+        this("ROOT");
     }
 
-    CommandTreeBuilder(@NotNull String name, @NotNull CommandTree.Node parent) {
+    TreeBuilder(@NotNull String name) {
         this.name = name;
-        this.parent = parent;
     }
 
-    public CommandTreeBuilder withChild(@NotNull String name, @NotNull Consumer<CommandTreeBuilder> builder) {
-        children.put(name, builder);
+    /**
+     * Adds a child to the current Node.
+     * @param name The name of the child
+     * @param builder The builder of the child, so you can modify it.
+     * @return this
+     */
+    public TreeBuilder withChild(@NotNull String name, @NotNull Consumer<TreeBuilder> builder) {
+        children.put(name.toLowerCase(Locale.ROOT), builder);
         return this;
     }
 
-    public CommandTreeBuilder executes(@NotNull CartCommandExecutor executor) {
+    /**
+     * Adds what code is executed when this Node is triggered
+     * @param executor The CartCommandExecutor implementation
+     * @return this
+     */
+    public TreeBuilder executes(@NotNull CartCommandExecutor executor) {
         this.executor = executor;
         return this;
     }
 
-    public CommandTreeBuilder named(@NotNull String name) {
-        this.name = name;
+    /**
+     * Changes the name of this node.
+     * If this node is the {@code ROOT} Node, nothing will change.
+     * @param name The new name of the Node
+     * @return this
+     */
+    public TreeBuilder named(@NotNull String name) {
+        if (!this.name.equals("ROOT")) {
+            this.name = name;
+        }
+
         return this;
     }
 
+    /**
+     * Adds aliases to the Node.
+     * @param aliases All aliases
+     * @return this
+     */
+    public TreeBuilder withAliases(@NotNull String... aliases) {
+        this.aliases.addAll(Arrays.asList(aliases));
+        return this;
+    }
+
+    /**
+     * Constructs a new Node based off all the values of this <code>TreeBuilder</code>.
+     * @return A new Node.
+     */
     @Contract("-> new")
     public @NotNull CommandTree.Node build() {
-        CommandTree.Node node = new CommandNodeImpl(name, parent, executor);
 
-        for(Map.Entry<String, Consumer<CommandTreeBuilder>> entry : children.entrySet()) {
+        Set<CommandTree.Node> constructedChildren = new HashSet<>();
+        for(Map.Entry<String, Consumer<TreeBuilder>> entry : children.entrySet()) {
             String childName = entry.getKey();
-            Consumer<CommandTreeBuilder> consumer = entry.getValue();
+            Consumer<TreeBuilder> consumer = entry.getValue();
 
-            CommandTreeBuilder child = new CommandTreeBuilder(childName, node);
+            TreeBuilder child = new TreeBuilder(childName);
             consumer.accept(child);
-            node.addChild(child.build());
+            constructedChildren.add(child.build());
         }
 
-        return node;
+        return new CommandNodeImpl(
+                name,
+                executor,
+                Set.of(),
+                aliases,
+                constructedChildren.toArray(new CommandTree.Node[0])
+        );
     }
 
 }

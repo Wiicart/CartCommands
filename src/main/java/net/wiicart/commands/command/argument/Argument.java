@@ -1,4 +1,19 @@
-package net.wiicart.commands.command;
+package net.wiicart.commands.command.argument;
 
-public class Argument {
+import org.bukkit.command.TabCompleter;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+
+public interface Argument extends TabCompleter {
+    @Contract("_ -> new")
+    static @NotNull ArgumentSequence sequence(Argument... arguments) {
+        return new ArgumentSequence(arguments);
+    }
+
+    /**
+     * Provides the expected argument type
+     * @return The Class of the type
+     */
+    @NotNull Class<?> type();
+
 }

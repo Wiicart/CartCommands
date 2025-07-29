@@ -1,55 +1,45 @@
-package net.wiicart.commands.command;
+package net.wiicart.commands.command.tree;
 
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
+import net.wiicart.commands.command.CartCommandExecutor;
+import net.wiicart.commands.command.CommandData;
+import net.wiicart.commands.command.argument.ArgumentSequence;
+import static org.jetbrains.annotations.ApiStatus.Experimental;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 final class CommandNodeImpl implements CommandTree.Node {
 
     private final String name;
 
-    private final CommandTree.Node parent;
-
     private final Set<CommandTree.Node> children;
 
     private final CartCommandExecutor executor;
 
-    CommandNodeImpl(@NotNull String name, CartCommandExecutor executor, CommandTree.Node... children) {
+    private final Set<ArgumentSequence> arguments;
+
+    private final Set<String> aliases;
+
+    CommandNodeImpl(
+            @NotNull String name,
+            @NotNull CartCommandExecutor executor,
+            @NotNull Set<ArgumentSequence> arguments,
+            @NotNull Set<String> aliases,
+            @NotNull CommandTree.Node... children
+    ) {
         this.name = name;
-        parent = null;
         this.executor = executor;
+        this.arguments = Set.copyOf(arguments);
+        this.aliases = Set.copyOf(aliases);
         this.children = new HashSet<>(Arrays.asList(children));
     }
 
-    CommandNodeImpl(@NotNull String name, @Nullable CommandTree.Node parent, CartCommandExecutor executor, CommandTree.Node... children) {
-        this.name = name;
-        this.parent = parent;
-        this.executor = executor;
-        this.children = new HashSet<>(Arrays.asList(children));
-    }
-
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        return true;
+    public void onCommand(CommandData data) {
+        executor.onCommand(data);
     }
-
-    @Override
-    @NotNull
-    public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
-        return List.of();
-    }
-
-    @Override
-    public void onCommand(CommandSender sender, String[] args, String label) {
-        executor.onCommand(sender, args, label);
-    }
-
 
     @Override
     public @NotNull String name() {
@@ -62,18 +52,19 @@ final class CommandNodeImpl implements CommandTree.Node {
     }
 
     @Override
-    public void addChild(@NotNull CommandTree.Node child) {
-        children.add(child);
+    @Experimental
+    public @NotNull Set<ArgumentSequence> arguments() {
+        return arguments;
     }
 
     @Override
-    @Nullable
-    public CommandTree.Node parent() {
-        return parent;
+    public @NotNull Set<String> aliases() {
+        return aliases;
     }
 
     @Override
     public boolean isLeaf() {
         return children.isEmpty();
     }
+
 }

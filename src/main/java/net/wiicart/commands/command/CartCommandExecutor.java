@@ -1,17 +1,10 @@
 package net.wiicart.commands.command;
 
-import net.wiicart.commands.function.TriConsumer;
-import org.bukkit.command.CommandSender;
-
 @FunctionalInterface
-public interface CartExecutor extends TriConsumer<CommandSender, String[], String> {
+public interface CartCommandExecutor {
 
-    static CartExecutor EMPTY = (s, a, l) -> {};
+    CartCommandExecutor EMPTY = d -> {};
 
-    default void accept(CommandSender sender, String[] args, String label) {
-        onCommand(sender, args, label);
-    }
-
-    void onCommand(CommandSender sender, String[] args, String label);
+    void onCommand(CommandData data);
 
 }

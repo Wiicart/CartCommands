@@ -10,16 +10,16 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-public final class TabCompleteUtilities {
+public final class TabCompleteUtil {
 
     public static final List<String> EMPTY = List.of();
 
-    private TabCompleteUtilities() {}
+    private TabCompleteUtil() {}
 
     /**
      * Provides a List of all online Player names.
      *
-     * @return A populated List<String>
+     * @return A populated List of Strings
      */
     @NotNull
     public static List<String> getOnlinePlayerNames() {
@@ -50,7 +50,7 @@ public final class TabCompleteUtilities {
      * Ignores duplicate values.
      *
      * @param collections Collections to be added to the final List.
-     * @return A populated List<String>
+     * @return A populated List of Strings
      */
     @SafeVarargs
     @NotNull
@@ -68,7 +68,7 @@ public final class TabCompleteUtilities {
      *
      * @param string The individual String
      * @param collections Collections to be added to the final List.
-     * @return A populated List<String>
+     * @return A populated List of Strings
      */
     @SafeVarargs
     @NotNull
