@@ -13,10 +13,9 @@ A tree is built that is ROOT/join/silent, so the same should be expected in the 
 public class PathTest extends CommandTree {
 
     @Test
-    public void init() {
-        PathTest test = new PathTest();
+    public void test() {
         try {
-            test.onCommand(null, null, null, new String[]{"join", "silent"});
+            onCommand(null, null, null, new String[]{"join", "silent"});
         } catch (Exception e) {
             assert e instanceof CommandExecutionException;
             assert ((CommandExecutionException) e).getPath().equalsIgnoreCase("ROOT/join/silent");
@@ -28,9 +27,9 @@ public class PathTest extends CommandTree {
                 .withChild("join", b ->
                         b.withChild(
                         "silent",
-                        c -> c.executes((data -> {
+                        c -> c.executes(data -> {
                             throw new RuntimeException("test");
-                        }))
+                        })
                 )).build()
         );
     }

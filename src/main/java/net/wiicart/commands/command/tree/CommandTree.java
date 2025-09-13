@@ -8,20 +8,30 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
-import static org.jetbrains.annotations.ApiStatus.Experimental;
+
+import static org.jetbrains.annotations.ApiStatus.*;
+
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
 
 /**
  * The class most commands will extend to create a Command.
  * This stores the root node and logic for passing a Command down the tree.
  */
 @SuppressWarnings("unused")
-public abstract class CommandTree implements CommandExecutor, TabCompleter {
+public class CommandTree implements CommandExecutor, TabCompleter {
+
+    /**
+     * Passed into a constructor to signify the CartCommandExecutor is the class itself.
+     * Gets around the issue of passing "this" into super-class constructor.
+     */
+    protected static final This THIS = new This();
 
     private final Node root;
 
@@ -35,12 +45,45 @@ public abstract class CommandTree implements CommandExecutor, TabCompleter {
     }
 
     /**
-     * Protected constructor for subclasses.
+     * Builds a CommandTree from a single CartCommandExecutor.
+     * @param executor The executor
+     * @return A new CommandTree
+     */
+    @Contract("_ -> new")
+    public static @NotNull CommandTree from(@NotNull CartCommandExecutor executor) {
+        return new CommandTree(builder().executes(executor).build());
+    }
+
+    @NotNull
+    @Contract("_ -> new")
+    public static CommandTree single(@NotNull CartCommandExecutor executor) {
+        return new CommandTree(builder().executes(executor).build());
+    }
+
+    /**
+     * Primary constructor.
      * Use {@link CommandTree#builder()} to build the Tree.
      * @param root The root node.
      */
-    protected CommandTree(@NotNull Node root) {
+    public CommandTree(@NotNull Node root) {
         this.root = root;
+    }
+
+    /**
+     * A constructor that provides a builder, so that the root's executor can be this class.
+     * If you are using this constructor, your class MUST implement {@link CartCommandExecutor}
+     * @param marker The static final {@link CommandTree.This} instance
+     * @param b A consumer providing the builder.
+     */
+    protected CommandTree(@NotNull This marker, @NotNull Consumer<TreeBuilder> b) {
+        if (this instanceof CartCommandExecutor ex) {
+            TreeBuilder builder = builder();
+            builder.executes(ex);
+            b.accept(builder);
+            this.root = builder.build();
+        } else {
+            throw new ClassCastException("CommandTree must implement CartCommandExecutor when using the \"THIS\" constructor.");
+        }
     }
 
     @Override
@@ -152,5 +195,9 @@ public abstract class CommandTree implements CommandExecutor, TabCompleter {
 
         boolean isLeaf();
 
+    }
+
+    protected static class This {
+        private This() {}
     }
 }

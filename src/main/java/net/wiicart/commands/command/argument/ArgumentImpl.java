@@ -3,10 +3,12 @@ package net.wiicart.commands.command.argument;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
+@ApiStatus.Experimental
 class ArgumentImpl implements Argument {
 
     private final Class<?> type;

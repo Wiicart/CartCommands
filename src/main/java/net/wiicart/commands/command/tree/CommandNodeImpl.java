@@ -37,7 +37,7 @@ final class CommandNodeImpl implements CommandTree.Node {
     }
 
     @Override
-    public void onCommand(CommandData data) {
+    public void onCommand(@NotNull CommandData data) {
         executor.onCommand(data);
     }
 

@@ -6,7 +6,7 @@
 
     <groupId>net.wiicart.commands</groupId>
     <artifactId>cart-commands</artifactId>
-    <version>1.0</version>
+    <version>1.1</version>
 
     <name>CartCommands</name>
     <description>Command framework that supports Bukkit and its forks</description>
@@ -51,7 +51,7 @@
                     <execution>
                         <id>attach-sources</id>
                         <goals>
-                            <goal>jar</goal>
+                            <goal>jar-no-fork</goal> <!-- jar -->
                         </goals>
                     </execution>
                 </executions>
@@ -62,7 +62,8 @@
                 <version>3.6.3</version>
                 <executions>
                     <execution>
-                        <id>attach-javadocs</id>
+                        <id>attach-sources</id>
+                        <phase>package</phase>
                         <goals>
                             <goal>jar</goal>
                         </goals>
@@ -86,12 +87,6 @@
         </plugins>
     </build>
 
-    <properties>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
-
     <distributionManagement>
         <repository>
             <id>ossrh</id>
@@ -101,22 +96,29 @@
         <snapshotRepository>
             <id>ossrh</id>
             <name>Central Snapshot Repository OSSRH</name>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+            <url>https://central.sonatype.com/repository/maven-snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
 
+    <properties>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
     <repositories>
         <repository>
-            <id>spigot-repo</id>
-            <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+            <id>codemc-repo</id>
+            <url>https://repo.codemc.io/repository/maven-public/</url>
         </repository>
     </repositories>
 
     <dependencies>
+        <!-- https://mvnrepository.com/artifact/org.bukkit/bukkit -->
         <dependency>
             <groupId>org.bukkit</groupId>
             <artifactId>bukkit</artifactId>
-            <version>1.13.1-R0.1-SNAPSHOT</version>
+            <version>1.5.2-R0.1</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -124,6 +126,12 @@
             <artifactId>annotations</artifactId>
             <version>26.0.2</version>
             <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.13.1</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>

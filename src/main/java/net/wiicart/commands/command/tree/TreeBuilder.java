@@ -20,6 +20,8 @@ public final class TreeBuilder {
 
     private String name;
 
+    private final Workbench bench;
+
     private final Set<String> aliases = new HashSet<>();
 
     private final Map<String, Consumer<TreeBuilder>> children = new HashMap<>();
@@ -27,11 +29,44 @@ public final class TreeBuilder {
     private CartCommandExecutor executor = CartCommandExecutor.EMPTY;
 
     TreeBuilder() {
-        this("ROOT");
+        this("ROOT", new Workbench());
     }
 
-    TreeBuilder(@NotNull String name) {
+    private TreeBuilder(@NotNull String name, @NotNull Workbench bench) {
         this.name = name;
+        this.bench = bench;
+    }
+
+    /**
+     * Provides a consumer to access the {@link Workbench} instance.
+     * The Workbench can be used to run code and store/retrieve Objects while building a CommandTree.
+     * @param consumer The consumer
+     * @return this
+     */
+    @NotNull
+    public TreeBuilder workbench(@NotNull Consumer<Workbench> consumer) {
+        consumer.accept(bench);
+        return this;
+    }
+
+    /**
+     * Provides a way to modify this TreeBuilder via a Consumer.
+     * @param consumer The Consumer
+     * @return this
+     */
+    public TreeBuilder run(@NotNull Consumer<TreeBuilder> consumer) {
+        consumer.accept(this);
+        return this;
+    }
+
+    /**
+     * Provides the {@link Workbench} instance, which can be used to run code and store/retrieve Objects.<br/>
+     * This instance persists through TreeBuilders for children via {@link TreeBuilder#withChild(String, Consumer)}.
+     * @return The Workbench instance
+     */
+    @NotNull
+    public Workbench getWorkbench() {
+        return bench;
     }
 
     /**
@@ -52,6 +87,17 @@ public final class TreeBuilder {
      */
     public TreeBuilder executes(@NotNull CartCommandExecutor executor) {
         this.executor = executor;
+        return this;
+    }
+
+    /**
+     * Sets the executor based off the result of {@link Workbench#retrieve(Class, String)}.
+     * @param name The name of the stored object to retrieve.
+     * @throws ClassCastException If the provided object does not implement {@link CartCommandExecutor}
+     * @return this
+     */
+    public TreeBuilder executes(@NotNull String name) {
+        this.executor = bench.retrieve(CartCommandExecutor.class, name);
         return this;
     }
 
@@ -91,7 +137,7 @@ public final class TreeBuilder {
             String childName = entry.getKey();
             Consumer<TreeBuilder> consumer = entry.getValue();
 
-            TreeBuilder child = new TreeBuilder(childName);
+            TreeBuilder child = new TreeBuilder(childName, bench);
             consumer.accept(child);
             constructedChildren.add(child.build());
         }

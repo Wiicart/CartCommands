@@ -1,5 +1,6 @@
 package net.wiicart.commands.command.argument;
 
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -7,6 +8,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 
 @SuppressWarnings("ClassCanBeRecord")
+@ApiStatus.Experimental
 public class ArgumentSequence implements Iterable<Argument> {
 
     public static final ArgumentSequence EMPTY = new ArgumentSequence();

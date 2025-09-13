@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -23,7 +24,7 @@ public final class TabCompleteUtil {
      */
     @NotNull
     public static List<String> getOnlinePlayerNames() {
-        Collection<? extends Player> players = Bukkit.getOnlinePlayers();
+        Collection<? extends Player> players = Arrays.asList(Bukkit.getOnlinePlayers());
         List<String> list = new ArrayList<>(players.size());
         for(Player p : players) {
             list.add(p.getName());

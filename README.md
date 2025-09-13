@@ -13,6 +13,6 @@ traditional Bukkit way.
 <dependency>
     <groupId>net.wiicart.commands</groupId>
     <artifactId>cart-commands</artifactId>
-    <version>1.0</version>
+    <version>1.1</version>
 </dependency>
 ```
